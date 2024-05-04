@@ -25,7 +25,6 @@ const SignupComponent: React.FC<props> = ({ database }): JSX.Element => {
             console.log(uid);
             userData.userId = uid;
             console.log(userData.userId);
-            console.log("This is your user id", uid);
             const path = ref(database, 'users/' + uid);
             set(path, userData).then(() => {
                 console.log("data added successfully");

@@ -10,8 +10,11 @@ interface props {
 type messageType = {
     text: string
 }
+interface display {
+    message: string,
+    index: number
+}
 const buttonHandler = (senderId: string, receiverId: string, message: string, database: Database) => {
-    console.log(receiverId);
     const messagesRef = ref(database ,'messages');
     const reff = push(messagesRef);
     const newMessage = {
@@ -39,14 +42,21 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         )
         get(queryRefsender).then(snapshot => {
             if(snapshot.exists()) {
+                let message: any = [];
                 snapshot.forEach(childSnapshot => {
                     const data = childSnapshot.val();
-                    if(data.receiverId === senderId) {
-                        const message: any = data.new_message;
-                        setallsenderMessages(prev => [...prev, message])
-                        console.log(allsenderMessages)
+                    console.log(data);
+                    console.log(receiverId);
+                    console.log(data.receiverId);
+
+                    if(data.receiverId === receiverId) {
+                        console.log('you are in');
+                        message.push(data.new_message);
                     }
                 })
+                setallsenderMessages([...message]);
+                message = []
+                console.log("this is from the sender", allsenderMessages);
             }
             else {
                 console.log('you guys are haven"t started the legendary conversation');
@@ -54,14 +64,16 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         })
         get(queryRefreceiver).then(snapshot => {
             if(snapshot.exists()) {
+                let message: any = [];
                 snapshot.forEach(childSnapshot => {
                     const data = childSnapshot.val();
-                    if(data.senderId === receiverId) {
-                        const message: any = data.new_message;
-                        setallreceiverMessages(prev => [...prev, message]);
-                        console.log(allreceiverMessages);
+                     if(data.receiverId === senderId) {
+                        message.push(data.new_message);
                     }
                 })
+                setallreceiverMessages([...message]);
+                message = []
+                console.log("this is from the receiver", allreceiverMessages);
             }
             else {
                 console.log('you guys are haven"t started the legendary conversation');
@@ -74,7 +86,11 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
     return (
         <div>
             <div>
-                
+                {allsenderMessages.map((message: messageType, index) => {
+                    return (
+                        <div key = { index }>{ message.text }</div>
+                    )
+                })}
             </div>
             <input type = 'text' placeholder="send messsage" onChange = {(events) => {
                 setMessage(events.target.value);
