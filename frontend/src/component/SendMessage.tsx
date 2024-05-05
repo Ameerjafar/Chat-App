@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
 import { Database, ref, push, set, orderByChild, equalTo, query, get } from 'firebase/database';
 import { Timestamp } from "firebase/firestore";
+import { TwoIndividualMessage } from "./TwoIndividualMessage";
 
 interface props {
     senderId: string,
     receiverId: string,
     database: Database
 }
-type messageType = {
-    text: string
-}
-interface display {
-    message: string,
-    index: number
-}
+
 const buttonHandler = (senderId: string, receiverId: string, message: string, database: Database) => {
     const messagesRef = ref(database ,'messages');
     const reff = push(messagesRef);
@@ -30,8 +25,8 @@ const buttonHandler = (senderId: string, receiverId: string, message: string, da
 
 const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.Element => {
     const [message, setMessage] = useState('');
-    const [allsenderMessages, setallsenderMessages] = useState<messageType[]>([])
-    const [allreceiverMessages, setallreceiverMessages] = useState<messageType[]>([]);
+    const [allsenderMessages, setallsenderMessages] = useState<string[][]>([[]])
+    const [allreceiverMessages, setallreceiverMessages] = useState<string[][]>([[]]);
     const gettingIndividualsMessage = () => {
         const messageref = ref(database, 'messages');
         const queryRefsender = query(messageref, 
@@ -42,7 +37,8 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         )
         get(queryRefsender).then(snapshot => {
             if(snapshot.exists()) {
-                let message: any = [];
+                let message: any = [[]];
+                let i = 0;
                 snapshot.forEach(childSnapshot => {
                     const data = childSnapshot.val();
                     console.log(data);
@@ -50,8 +46,7 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
                     console.log(data.receiverId);
 
                     if(data.receiverId === receiverId) {
-                        console.log('you are in');
-                        message.push(data.new_message);
+                        message[i] = [data.new_message, (data.createdAt.seconds) / 60];
                     }
                 })
                 setallsenderMessages([...message]);
@@ -85,13 +80,7 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
     }, [])
     return (
         <div>
-            <div>
-                {allsenderMessages.map((message: messageType, index) => {
-                    return (
-                        <div key = { index }>{ message.text }</div>
-                    )
-                })}
-            </div>
+            <TwoIndividualMessage allreceiverMessages = { allreceiverMessages } allsenderMessages = { allsenderMessages } />
             <input type = 'text' placeholder="send messsage" onChange = {(events) => {
                 setMessage(events.target.value);
             }}></input>

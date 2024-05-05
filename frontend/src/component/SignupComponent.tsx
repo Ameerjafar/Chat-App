@@ -15,7 +15,7 @@ const SignupComponent: React.FC<props> = ({ database }): JSX.Element => {
         lastName,
         email,
         password,
-        userId: ''
+        userId: '',
     }
     const buttonHandler = () => {
         const auth = getAuth();
@@ -39,19 +39,36 @@ const SignupComponent: React.FC<props> = ({ database }): JSX.Element => {
     }
     return (
         <div>
-            <input type = 'text' placeholder="Enter your email" onChange={(events) => {
-                setEmail(events.target.value);
-            }}></input>
-            <input type = 'password' placeholder="Enter your password" onChange = {(events) => {
-                setPassword(events.target.value);
-            }}></input>
-            <input type = 'text' placeholder="Enter your firstName" onChange={(events) => {
-                setFirstName(events.target.value);
-            }}></input>
-            <input type = 'text' placeholder="Enter your lastName" onChange={(events) => {
-                setlastName(events.target.value);
-            }}></input>
-            <button type = 'submit' onClick = {buttonHandler}>submit</button>
+            <div className = 'flex h-screen pr-96 justify-end items-center'>
+                <div>
+
+                </div>
+                <div className = 'p-10 bg-gray-400 rounded-lg'>
+                    <div>
+                        <input type = 'text' placeholder="Enter your email" onChange={(events) => {
+                        setEmail(events.target.value);
+                        }}></input>
+                    </div>
+                    <div>
+                        <input type = 'password' placeholder="Enter your password" onChange = {(events) => {
+                        setPassword(events.target.value);
+                        }}></input>
+                    </div>
+                    <div>
+                        <input type = 'text' placeholder="Enter your firstName" onChange={(events) => {
+                        setFirstName(events.target.value);
+                        }}></input>
+                    </div>
+                    <div>
+                        <input type = 'text' placeholder="Enter your lastName" onChange={(events) => {
+                        setlastName(events.target.value);
+                    }}></input>
+                    </div>
+                    <div>
+                        <button type = 'submit' onClick = {buttonHandler}>submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
