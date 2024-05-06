@@ -44,7 +44,7 @@ const Dashboard: React.FC<Props> = ({ setReceiverId, database }): JSX.Element =>
             console.log(d[0]);  
             console.log(data);
             const values: Array<any> = Object.values(data);
-            setusers(preValues => [...values]);
+            setusers([...values]);
             console.log(users);
             console.log(values);
         })

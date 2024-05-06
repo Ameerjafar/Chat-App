@@ -1,30 +1,19 @@
 
 
-interface props {
-    allreceiverMessages: string[]
-    allsenderMessages: string[]
+interface props     {
+    message: [{}]
 }
-const TwoIndividualMessage: React.FC<props> = ({ allreceiverMessages, allsenderMessages }) => {
+const TwoIndividualMessage: React.FC<props> = ({ message }) => {
     return (
         <div>
             <div>
-                <div>
-                    {allreceiverMessages.map((message, index) => {
-                        return (
-                            <div key = { index }> { message }</div>
-                        )
-                    })}
-                </div>
-                <div>
-                    {allsenderMessages.map((message, index) => {
-                        return (
-                            <div key = { index }>{ message }</div>
-                        )
-                    })}
-                </div>
+                {message.map((msg: any) => {
+                    return (
+                        <div key = { msg.Id }>{ msg.new_message }</div>
+                    )
+                })}
             </div>
         </div>
     )
-
 }
 export { TwoIndividualMessage }

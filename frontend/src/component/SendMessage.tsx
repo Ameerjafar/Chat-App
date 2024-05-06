@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import { Database, ref, push, set, orderByChild, equalTo, query, get } from 'firebase/database';
-import { Timestamp } from "firebase/firestore";
 import { TwoIndividualMessage } from "./TwoIndividualMessage";
-
 interface props {
     senderId: string,
     receiverId: string,
     database: Database
 }
-
 const buttonHandler = (senderId: string, receiverId: string, message: string, database: Database) => {
     const messagesRef = ref(database ,'messages');
     const reff = push(messagesRef);
@@ -16,17 +13,17 @@ const buttonHandler = (senderId: string, receiverId: string, message: string, da
         senderId: senderId,
         receiverId: receiverId,
         new_message: message,
-        createdAt: Timestamp.now()
+        arrivalTime: new Date().getTime()
     }
     set(reff, newMessage).then(() => {
         console.log("data added successfully");
+        console.log(newMessage);
     })
 }
 
 const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.Element => {
-    const [message, setMessage] = useState('');
-    const [allsenderMessages, setallsenderMessages] = useState<string[][]>([[]])
-    const [allreceiverMessages, setallreceiverMessages] = useState<string[][]>([[]]);
+    const [message, setMessage] = useState<any>();
+    const [presMessage, setPresMessage] = useState('');
     const gettingIndividualsMessage = () => {
         const messageref = ref(database, 'messages');
         const queryRefsender = query(messageref, 
@@ -37,8 +34,7 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         )
         get(queryRefsender).then(snapshot => {
             if(snapshot.exists()) {
-                let message: any = [[]];
-                let i = 0;
+                let innerMessage: any = {};
                 snapshot.forEach(childSnapshot => {
                     const data = childSnapshot.val();
                     console.log(data);
@@ -46,12 +42,11 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
                     console.log(data.receiverId);
 
                     if(data.receiverId === receiverId) {
-                        message[i] = [data.new_message, (data.createdAt.seconds) / 60];
+
                     }
-                })
-                setallsenderMessages([...message]);
-                message = []
-                console.log("this is from the sender", allsenderMessages);
+                })  
+                setMessage({...innerMessage});
+                console.log("this is from the sender", message);
             }
             else {
                 console.log('you guys are haven"t started the legendary conversation');
@@ -59,16 +54,16 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         })
         get(queryRefreceiver).then(snapshot => {
             if(snapshot.exists()) {
-                let message: any = [];
+                const innerMessage: any = [];
                 snapshot.forEach(childSnapshot => {
                     const data = childSnapshot.val();
-                     if(data.receiverId === senderId) {
-                        message.push(data.new_message);
+                    if(data.receiverId === senderId) {
+                        innerMessage.push(data);
                     }
                 })
-                setallreceiverMessages([...message]);
-                message = []
-                console.log("this is from the receiver", allreceiverMessages);
+                console.log(innerMessage);
+                setMessage([...innerMessage])
+                console.log("this is from the receiver", message);
             }
             else {
                 console.log('you guys are haven"t started the legendary conversation');
@@ -76,16 +71,16 @@ const SendMessage: React.FC<props> = ({ senderId, receiverId, database}): JSX.El
         })
     }
     useEffect(() => {
-        gettingIndividualsMessage(); 
+        gettingIndividualsMessage();
     }, [])
     return (
         <div>
-            <TwoIndividualMessage allreceiverMessages = { allreceiverMessages } allsenderMessages = { allsenderMessages } />
+            <TwoIndividualMessage message = { message } />
             <input type = 'text' placeholder="send messsage" onChange = {(events) => {
-                setMessage(events.target.value);
+                setPresMessage(events.target.value);
             }}></input>
             <button onClick = { () => {
-                buttonHandler(senderId, receiverId, message, database);
+                buttonHandler(senderId, receiverId, presMessage, database);
             } }>send</button>
         </div>
     )
